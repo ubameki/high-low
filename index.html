@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: content: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+      .fs {
+        font-size: 120%;
+      }
+
+      #challenge {
+        padding-left: 20px;
+      }
+
+      .btn--orange,
+      a.btn--orange {
+        padding-left: 1em;
+        padding-right: 1em;
+        height: 3em;
+        color: #fff;
+        background-color: #eb6100;
+      }
+
+        .btn--orange:hover,
+        a.btn--orange:hover {
+        color: #fff;
+        background: #f56500;
+      }
+
+      .btn--red,
+      a.btn--red {
+        padding-left: 1em;
+        padding-right: 1em;
+        height: 3em;
+        color: #fff;
+        background-color: #ff0000;
+      }
+      .btn--red:hover,
+      a.btn--red:hover {
+        color: #fff;
+        background: #f0566e;
+      }
+
+      .btn--yellow,
+      a.btn--yellow {
+        padding-left: 1em;
+        padding-right: 1em;
+        height: 3em;
+        color: #000;
+        background-color: #fbb034;
+      }
+
+      .btn--yellow:hover,
+      a.btn--yellow:hover {
+        color: #000;
+        background: #ffcc33;
+      }
+
+      input {
+        background-color: #d3d3d3;
+      }
+
+      img {
+            width: 300px;
+            height: auto;
+      }
+    </style>
+
+    <script>
+      var ans;      //  正解
+      var ans_c;    //  解答回数
+      var ch_msg;   //  チャレンジメッセージ
+      var ans_col;  //  解答欄(テキストボックス)
+      var kaito_id; //  解答欄のidプロパティ値
+      var maxVal;   //  最大値(value用)
+      var timer;    //  タイマー
+      var timeLimit = 60; // 制限時間(秒)
+      var remainingTime;  // 残り時間
+      var max;            // 最大値(innerText用)
+
+      function gameStart() {
+        max = document.getElementById("maxValue").value;
+        document.getElementById("max").innerText = max;
+        maxVal = parseInt(max);
+        ans = Math.floor(Math.random() * maxVal);
+        ans_c = 1;
+        ch_msg = '<button class="btn btn--yellow" onClick="check()">';
+        ch_msg += ans_c + '回目' + '</button>';
+        kaito_id = 'kaito' + ans_c;
+        ans_col = '<input type="text" ' + 'class="fs" id="' + kaito_id + '" size="3">';
+        document.getElementById("challenge").innerHTML = ch_msg + ans_col;
+        document.getElementById("start").innerHTML = "1回目に戻る";
+        document.getElementById("picture").style.display = "none";
+
+        remainingTime = timeLimit;
+        document.getElementById("ch").innerHTML = "残り時間: " + remainingTime + "秒";
+        timer = setInterval(updateTimer, 1000);
+      }
+
+      function check() {
+        kaito_id = 'kaito' + ans_c;
+        var kaito = parseInt(document.getElementById(kaito_id).value);
+        if (isNaN(kaito)) {
+          return;
+        }
+        ch_msg += ' <span class="fs">' + kaito + "： ";
+
+        if (kaito == ans) {
+          ch_msg += '<span style="color: red;">○ 正解です！！</span>' + "</span>";
+          document.getElementById("challenge").innerHTML = ch_msg;
+          clearInterval(timer);
+          document.getElementById("ch").innerHTML = "記録: " + remainingTime + "秒";
+          document.getElementById("picture").style.display = "inline";
+        } else {
+          if (kaito < ans) {
+            ch_msg += '↑ 上です！！</span><br>';
+          } else {
+            ch_msg += '↓ 下です！！</span><br>';
+          }
+          ans_c++;
+          ch_msg += '<button class="btn btn--yellow" onClick="check()">';
+          ch_msg += ans_c + '回目' + '</button>';
+          kaito_id = 'kaito' + ans_c;
+          ans_col = '<input type="text"' + 'class="fs" id="' + kaito_id + '" size="3">';
+          document.getElementById("challenge").innerHTML = ch_msg + ans_col;
+        }
+      }
+
+      function updateTimer() {
+        remainingTime--;
+        document.getElementById("ch").innerHTML = "残り時間: " + remainingTime + "秒";
+
+        if (remainingTime <= 0) {
+          clearInterval(timer);
+          document.getElementById("challenge").innerHTML = "<span class='fs' style='color: red; font-weight: bold;'>時間切れです！</span>";
+          document.getElementById("answer").style.display = "inline";
+          document.getElementById("picture").style.display = "none";
+        }
+      }
+
+      function checkingAnswer() {
+        alert(ans);
+        document.getElementById("answer").style.display = "inline";
+        document.getElementById("picture").style.display = "none";
+      }
+
+      function reset() {
+        document.getElementById("maxValue").value = "";
+        document.getElementById("ch").innerHTML = "";
+        document.getElementById("challenge").innerHTML = "";
+        document.getElementById("start").innerHTML = "ゲームスタート";
+
+        ans = null;
+        ans_c = 0;
+        ch_msg = "";
+        ans_col = "";
+        kaito_id = "";
+
+        clearInterval(timer);
+        document.getElementById("max").innerText = "最大値"
+        document.getElementById("answer").style.display = "none";
+        document.getElementById("picture").style.display = "none";
+      }
+    </script>
+</head>
+
+<body>
+  <div style="text-align: center;">
+    <h1>数あてゲーム</h1>
+    <h2>ハイ＆ロー</h2>
+
+    <h3 class="fs">最大値を入力してください</h3>
+    <input type="text" id="maxValue" class="fs" value="" placeholder="数字を入力してください">
+    <h3 class="fs">制限時間は60秒!</h3>
+    <h3 class="fs">0～<span id="max">最大値</span>の間に正解があります！</h3>
+    <button id="start" class="btn btn--orange" onclick="gameStart()">ゲームスタート</button>
+    <h2 id="ch"></h2>
+    <div id="challenge"></div>
+    <br>
+    <img id="picture" src="image/message_omedetou.png" style="display: none;">
+  </div>
+  <br>
+  <button id="answer" class="btn btn--red" onclick="checkingAnswer()" style="display: none;">答え</button>
+  <br><br>
+  <button id="reset" class="btn btn--red" onclick="reset()">リセット</button>
+</body>
+</html>
+<!-- 二分探索を用いることで最小回数で正解を探すことができる
+   2^n >= 100 より ７回以内で探すことができる  -->
